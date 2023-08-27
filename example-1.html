@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Backbone.js Example - TODO List</title>
+
+  <link href=" https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css " rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.0/dist/jquery.slim.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/backbone@1.5.0/backbone-min.min.js"></script>
+</head>
+<body class="bg-light">
+  <div id="app" class="container my-5 py-5">
+    <div class="row">
+      <div class="col-lg-4 col-md-7">
+        <h1>TODO List</h1>
+        <form class="form">
+          <input type="text" class="form-control title-input" placeholder="Enter todo item" />
+        </form>
+        <ul id="list" class="list-group my-2">
+          <script type="text/template" class="list-item-template">
+            <li class='list-group-item <%= item.get('done') ? 'text-decoration-line-through list-group-item-success' : '' %>'>
+              <%= index + 1 %>.
+              <a href='#' data-id='<%= item.cid %>'><%= item.get('title') %></a>
+            </li>
+          </script>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+<script>
+
+
+
+
+
+
+
+
+
+// 
+// TodoItem Model
+// 
+class TodoItem extends Backbone.Model {
+  preinitialize(){
+    this.defaults = {
+      'title': '',
+      'done': false
+    }
+  }
+}
+
+
+// 
+// TodoList Collection
+// 
+class TodoList extends Backbone.Collection {
+  preinitialize(){
+    this.model = TodoItem;
+  }
+}
+
+
+// 
+// List view that holds and renders the whole list
+// 
+class ListView extends Backbone.View {
+  preinitialize({ todo_list }){
+    this.todo_list = todo_list;
+
+    this.el = $('#list');
+    this.events = {
+      "submit .form": "add_new",
+      "click li a": "mark_done"
+    };
+
+    this.list_item_template = _.template(this.el.find('.list-item-template').html());
+
+    this.todo_list.on('add', this.render.bind(this));
+  }
+
+  mark_done(e){
+    e.preventDefault();
+    const item = this.todo_list.get(e.currentTarget.dataset.id);
+
+    item.set({done: !item.get('done')});
+    this.render();
+  }
+
+  render(){
+    let html = '';
+    _.forEachRight(this.todo_list.models, (item, index)=>{
+      html += this.list_item_template({item: item, index: index});
+    });
+
+    // We are rendering and re-rendering the whole list, as the model and view is small
+    // For large views and models setup another sub-view as ListItemView, to improve performance.
+    this.$el.html(html);
+  }
+}
+
+
+// 
+// Main App View that holds the whole app
+// 
+class AppView extends Backbone.View {
+  preinitialize(){
+    this.el = $('#app');
+
+    this.events = {
+      "submit .form": "add_new"
+    };
+
+    this.$input_el = this.el.find('.title-input').first();
+
+    this.todo_list = new TodoList;
+    this.list_view = new ListView({todo_list: this.todo_list});
+  }
+
+  add_new(e){
+    e.preventDefault();
+
+    const value = this.$input_el.val();
+
+    if(!value) return;
+
+    this.todo_list.push({ title: value });
+    this.$input_el.val('');
+  }
+}
+
+// Instantiate AppView to start the application
+new AppView;
+
+
+
+
+
+
+
+
+
+
+
+</script>

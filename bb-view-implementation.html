@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Experiment: An Implementation of Backbone.js View</title>
+  <style>
+    body{
+      padding-top: 50px;
+    }
+
+    textarea{
+      border: 2px solid #777;
+      border-left: 10px solid #777;
+      padding: 0px 20px 20px 5px;
+      background: #222;
+      color: #FFF;
+      line-height: 1.8em;
+      width: 96%;
+      margin: 10px 0;
+    }
+
+    hr{
+      margin: 100px 0px;
+    }
+  </style>
+  <script src="base-view.js"></script>
+</head>
+<body>
+<h1>Experiment: An Implementation of <a href="https://backbonejs.org/#View">Backbone.js View</a></h1>
+<ul>
+  <li>Provides basic functionality of Backbone.js View as <a href="base-view.js">an ES6 class</a>.</li>
+  <li>No dependencies. jQuery or underscore.js.</li>
+  <li>Provides two functions this.q(query_selector) and this.q_all(query_selector) similar to this.$el.find(query_selector).</li>
+  <li>Provides this.reference_elements similar to this.events to create predefined selector functions. (Not in Backbone.js.)</li>
+  <li>Uses <a href="https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events#event_bubbling">Event Bubbling</a> and <a href="https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events#event_delegation">Event Delegation</a>, same as Backbone.js.</li>
+  <li><a href="https://backbonejs.org/#View-render">Render function</a> can be defined if needed,<br/> with an <a href="https://lodash.com/docs/#template">underscore template</a> or <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals">template literal</a>, but must be called manually in preinitialize or when data changes.</li>
+  <li>Set this.debug to true to enable debug messages. Adds a red border to el.</li>
+</ul>
+
+<h3>Tip</h3>
+<ul>
+  <li>Inspect event listeners on el in <a href="https://firefox-source-docs.mozilla.org/devtools-user/page_inspector/how_to/examine_event_listeners/index.html">Firefox</a>, <a href="https://developer.chrome.com/blog/easily-jump-to-event-listeners/">Chrome</a>.</li>
+</ul>
+
+<hr/>
+
+<h2>Hello Example</h2>
+<p>Debug enabled for this view. Open console for debug messages.</p>
+
+<div id="hello">
+  <div id="form-container">
+    <form id="hello-form">
+      <input type="text" autocomplete="off" id="name_input" placeholder="trigger keydown" />
+      <input type="text" autocomplete="off" placeholder="doesn't trigger keydown" />
+      <input type="submit" />
+    </form>
+  </div>
+
+  <p id="output"></p>
+  <p>Said hello <span id="count">0</span> times.</p>
+
+  <button id="toggle_event_delegation">Toggle event delegation</button>
+</div>
+
+<textarea id="HelloViewCode" spellcheck="false"></textarea>
+
+<hr/>
+
+<h2>Counter Example</h2>
+<div>
+  <div class="counter"></div>
+  <div class="counter"></div>
+  <div class="counter"></div>
+  <div class="counter"></div>
+  <div class="counter"></div>
+</div>
+
+<textarea id="CounterViewCode" spellcheck="false"></textarea>
+
+<hr />
+
+<h2>Counter Example using re-render</h2>
+<div>
+  <div class="counter2"></div>
+  <div class="counter2"></div>
+  <div class="counter2"></div>
+  <div class="counter2"></div>
+  <div class="counter2"></div>
+</div>
+
+<textarea id="CounterView2Code" spellcheck="false"></textarea>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script id="HelloView">
+class HelloView extends BaseView{
+  preinitialize(){
+    this.el = document.getElementById('hello');
+
+    this.events = {
+      'keyup #name_input': 'handle_keyup',
+      'submit #hello-form': 'handle_submit',
+      'submit #form-container form': 'handle_submit_count',
+      'click #toggle_event_delegation': 'toggle_event_delegation',
+      'click': 'clicked_el'
+    };
+
+    this.reference_elements = {
+      'output': '#output',
+      'name_input': '#name_input',
+      'count': '#count'
+    }
+
+    this.count = 0;
+    this.debug = true;
+  }
+
+  handle_submit(e){
+    e.preventDefault();
+
+    this.output_el().textContent = `Hello ${this.name_input_el().value}!!!`;
+  }
+
+  handle_submit_count(e){
+    e.preventDefault();
+
+    this.count_el().textContent = ++this.count;
+  }
+
+  handle_keyup(e){
+    this.output_el().textContent = `Hello ${this.name_input_el().value}`;
+  }
+
+  toggle_event_delegation(){
+    this.undelegateEvents();
+    alert('undelegateEvents called, will call delegateEvents in 5 seconds. You can view events for el in inspector.');
+    setTimeout(()=>this.delegateEvents(), 5000);
+  }
+
+  clicked_el(){
+    console.log("hello from clicked_el. Triggered by click anywhere in el.");
+  }
+}
+// End of class HelloView
+
+
+const hello = new HelloView;
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script id="CounterView">
+class CounterView extends BaseView{
+  preinitialize(el){
+    this.el = el;
+
+    this.events = {
+      'click .increment': 'increment',
+      'click .decrement': 'decrement'
+    }
+
+    this.value = 0;
+    this.render();
+  }
+
+  increment(e){
+    e.preventDefault();
+    this.value = this.value + Number((e.target.dataset.size || 1));
+    this.q('.output').textContent = this.value;
+  }
+
+  decrement(e){
+    e.preventDefault();
+    this.value = this.value - Number((e.target.dataset.size || 1));
+    this.q('.output').textContent = this.value;
+  }
+
+  render(){
+    this.el.innerHTML = `
+      <p>
+        <button class="increment">Increment</button>
+        <a href="#increment-by-2" class="increment" data-size="2" title="Increment by 2">+</a>
+        <a href="#decrement-by-2" class="decrement" data-size="2" title="Decrement by 2">-</a>
+        <button class="decrement">Decrement</button>
+        <span class="output">${this.value}</span>
+      </p>
+    `;
+  }
+}
+// End of class CounterView
+
+
+
+// Instantiate CounterView for all counter elements.
+const counters = document.getElementsByClassName('counter');
+for (let i = 0; i < counters.length; i++) {
+  new CounterView(counters[i]);
+}
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script id="CounterView2">
+class CounterView2 extends BaseView{
+  preinitialize(el){
+    this.el = el;
+
+    this.events = {
+      'click .increment': 'increment',
+      'click .decrement': 'decrement'
+    }
+
+    this.value = 0;
+
+    this.render();
+  }
+
+  increment(){
+    this.value++;
+    this.render();
+  }
+
+  decrement(){
+    this.value--;
+    this.render();
+  }
+
+  render(){
+    this.el.innerHTML = `
+      <p>
+        <button class="increment">Increment</button>
+        <button class="decrement">Decrement</button>
+        <span class="output">${this.value}</span>
+      </p>
+    `;
+  }
+}
+// End of class CounterView2
+  
+  
+  
+// Instantiate CounterView for all counter elements.
+const counters2 = document.getElementsByClassName('counter2');
+for (let i = 0; i < counters2.length; i++) {
+  new CounterView2(counters2[i]);
+}
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+  function viewsource(id){
+    const src_text = document.getElementById(id).innerHTML;
+    const lines = src_text.split(/\r\n|\r|\n/).length;
+
+    document.getElementById(id + 'Code').value = "// Sourcecode Lines: " + lines + "\n" + src_text;
+    document.getElementById(id + 'Code').setAttribute('rows', lines + 2);
+  }
+
+  viewsource('HelloView');
+  viewsource('CounterView');
+  viewsource('CounterView2');
+</script>
