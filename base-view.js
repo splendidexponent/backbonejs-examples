@@ -35,10 +35,10 @@ class BaseView{
       const event_key_parts = event_key.match(/([^\s]+)\s(.*)/);
       // handle "click" without any selector. click event on el. ie. event_key_parts == null
       const event_name = event_key_parts == null ? event_key : event_key_parts[1];
-      const event_el_selector = event_key_parts == null ? this.el : event_key_parts[2];
+      const event_el_selector = event_key_parts == null ? null : event_key_parts[2];
       
       this.__events_fn[method_name] = (e) => {
-        if(event_el_selector == this.el || this.arr_contains(this.q_all(event_el_selector), e.target)){
+        if(event_el_selector == null || this.arr_contains(this.q_all(event_el_selector), e.target)){
           if(this.debug){
             console.log(this.constructor.name, `"${event_key}: ${method_name}" triggered, target:`, e.target, 'el:', this.el);
           }
