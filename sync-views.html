@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Experiment: SyncViews</title>
+  <style>
+    body{
+      padding-top: 50px;
+    }
+
+    textarea{
+      border: 2px solid #777;
+      border-left: 10px solid #777;
+      padding: 0px 20px 20px 5px;
+      background: #222;
+      color: #FFF;
+      line-height: 1.8em;
+      width: 96%;
+      margin: 10px 0;
+    }
+
+    hr{
+      margin: 100px 0px;
+    }
+
+    div[data-view="HelloView"]{
+      padding: 10px;
+      margin: 10px 0;
+    }
+  </style>
+  <script src="base-view.js"></script>
+  <script src="sync-views.js"></script>
+</head>
+<body>
+<h1>Experiment: <a href="sync-views.js">SyncViews</a></h1>
+<ul>
+  <li>Helper function to initialize/remove view instances in Javascript. Keeping them in sync with DOM.</li>
+  <li>Use SyncViews.addViewClass(ViewClass) to add View Classes to SyncViews.</li>
+  <li>Add data-view='ViewClass' to elements.</li>
+  <li>Run SyncViews.sync() to instantiate views.
+    <ul>
+      <li>You can run it multiple times if needed. For example, after a view element is added to DOM later.</li>
+      <li>It will also delete any view instances (in Javascript) for elements that are removed from DOM.</li>
+      <li>It holds instantiated view objects internally.</li>
+    </ul>
+  </li>
+  <li>SyncViews adds data-view-initialized='true' to elements that are instantiated with the ViewClass.</li>
+  <li>SyncViews also passes el as an arg to preinitialize.</li>
+  <li>Run SyncViews.debug = true to enable debug messages.</li>
+</ul>
+
+
+<script>
+  SyncViews.debug = true;
+</script>
+
+
+<hr/>
+
+<h2>Hello Example</h2>
+<p>Debug enabled for this view. Open console for debug messages.</p>
+
+<h3>First Instance</h3>
+<div data-view="HelloView">
+  <div class="form-container">
+    <form class="hello-form">
+      <input type="text" autocomplete="off" class="name_input" placeholder="trigger keydown" />
+      <input type="text" autocomplete="off" placeholder="doesn't trigger keydown" />
+      <input type="submit" />
+    </form>
+  </div>
+
+  <p class="output"></p>
+  <p>Said hello <span class="count">0</span> times.</p>
+
+  <button class="toggle_event_delegation">Toggle event delegation</button>
+</div>
+
+<h3>Second Instance</h3>
+<div data-view="HelloView">
+  <div class="form-container">
+    <form class="hello-form">
+      <input type="text" autocomplete="off" class="name_input" placeholder="trigger keydown" />
+      <input type="text" autocomplete="off" placeholder="doesn't trigger keydown" />
+      <input type="submit" />
+    </form>
+  </div>
+
+  <p class="output"></p>
+  <p>Said hello <span class="count">0</span> times.</p>
+
+  <button class="toggle_event_delegation">Toggle event delegation</button>
+
+  <h3>Nested Third Instance (Use <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:scope">:scope selector</a> for correct event selectors)</h3>
+  <div data-view="HelloView">
+    <div class="form-container">
+      <form class="hello-form">
+        <input type="text" autocomplete="off" class="name_input" placeholder="trigger keydown" />
+        <input type="text" autocomplete="off" placeholder="doesn't trigger keydown" />
+        <input type="submit" />
+      </form>
+    </div>
+  
+    <p class="output"></p>
+    <p>Said hello <span class="count">0</span> times.</p>
+  
+    <button class="toggle_event_delegation">Toggle event delegation</button>
+
+    <h3>Nested Counter Example</h3>
+    <div style="border: 1px solid #000; padding: 10px;">
+      <div data-view="CounterView"></div>
+      <div data-view="CounterView"></div>
+      <div data-view="CounterView"></div>
+      <div data-view="CounterView"></div>
+      <div data-view="CounterView"></div>
+    </div>
+  </div>
+</div>
+
+<textarea id="HelloViewCode" spellcheck="false"></textarea>
+
+<hr/>
+
+<h2>Counter Example</h2>
+<div>
+  <div data-view="CounterView"></div>
+  <div data-view="CounterView"></div>
+  <div data-view="CounterView"></div>
+  <div data-view="CounterView"></div>
+  <div data-view="CounterView"></div>
+</div>
+
+<textarea id="CounterViewCode" spellcheck="false"></textarea>
+
+<hr />
+
+<h2>Counter Example using re-render</h2>
+<div>
+  <div data-view="CounterView2"></div>
+  <div data-view="CounterView2"></div>
+  <div data-view="CounterView2"></div>
+  <div data-view="CounterView2"></div>
+  <div data-view="CounterView2"></div>
+</div>
+
+<textarea id="CounterView2Code" spellcheck="false"></textarea>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script id="HelloView">
+class HelloView extends BaseView{
+  preinitialize(el){
+    this.el = el;
+
+    this.events = {
+      'keyup :scope > .form-container .name_input': 'handle_keyup',
+      'submit :scope > .form-container .hello-form': 'handle_submit',
+      'submit :scope > .form-container form': 'handle_submit_count',
+      'click :scope > .toggle_event_delegation': 'toggle_event_delegation',
+      'click': 'clicked_el'
+    };
+
+    this.reference_elements = {
+      'output': ':scope > .output',
+      'name_input': ':scope > .form-container .name_input',
+      'count': ':scope > p .count'
+    }
+
+    this.count = 0;
+    this.debug = true;
+  }
+
+  handle_submit(e){
+    e.preventDefault();
+
+    this.output_el().textContent = `Hello ${this.name_input_el().value}!!!`;
+  }
+
+  handle_submit_count(e){
+    e.preventDefault();
+
+    this.count_el().textContent = ++this.count;
+  }
+
+  handle_keyup(e){
+    this.output_el().textContent = `Hello ${this.name_input_el().value}`;
+  }
+
+  toggle_event_delegation(){
+    this.undelegateEvents();
+    alert('undelegateEvents called, will call delegateEvents in 5 seconds. You can view events for el in inspector.');
+    setTimeout(()=>this.delegateEvents(), 5000);
+  }
+
+  clicked_el(){
+    console.log("hello from clicked_el. Triggered by click anywhere in el.");
+  }
+}
+// End of class HelloView
+
+// Add class to sync_view
+SyncViews.addViewClass(HelloView);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script id="CounterView">
+class CounterView extends BaseView{
+  preinitialize(el){
+    this.el = el;
+
+    this.events = {
+      'click .increment': 'increment',
+      'click .decrement': 'decrement'
+    }
+
+    this.value = 0;
+    this.render();
+  }
+
+  increment(e){
+    e.preventDefault();
+    this.value = this.value + Number((e.target.dataset.size || 1));
+    this.q('.output').textContent = this.value;
+  }
+
+  decrement(e){
+    e.preventDefault();
+    this.value = this.value - Number((e.target.dataset.size || 1));
+    this.q('.output').textContent = this.value;
+  }
+
+  render(){
+    this.el.innerHTML = `
+      <p>
+        <button class="increment">Increment</button>
+        <a href="#increment-by-2" class="increment" data-size="2" title="Increment by 2">+</a>
+        <a href="#decrement-by-2" class="decrement" data-size="2" title="Decrement by 2">-</a>
+        <button class="decrement">Decrement</button>
+        <span class="output">${this.value}</span>
+      </p>
+    `;
+  }
+}
+// End of class CounterView
+
+// Add class to sync_view
+SyncViews.addViewClass(CounterView);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>SyncViews.sync();</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script id="CounterView2">
+class CounterView2 extends BaseView{
+  preinitialize(el){
+    this.el = el;
+
+    this.events = {
+      'click .increment': 'increment',
+      'click .decrement': 'decrement'
+    }
+
+    this.value = 0;
+
+    this.render();
+  }
+
+  increment(){
+    this.value++;
+    this.render();
+  }
+
+  decrement(){
+    this.value--;
+    this.render();
+  }
+
+  render(){
+    this.el.innerHTML = `
+      <p>
+        <button class="increment">Increment</button>
+        <button class="decrement">Decrement</button>
+        <span class="output">${this.value}</span>
+      </p>
+    `;
+  }
+}
+// End of class CounterView2
+
+// Add class to sync_view
+SyncViews.addViewClass(CounterView2);
+</script>
+
+
+
+
+
+
+
+
+<script>SyncViews.sync();</script>
+
+
+
+
+
+
+
+
+
+
+<script>
+  function viewsource(id){
+    const src_text = document.getElementById(id).innerHTML;
+    const lines = src_text.split(/\r\n|\r|\n/).length;
+
+    document.getElementById(id + 'Code').value = "// Sourcecode Lines: " + lines + "\n" + src_text;
+    document.getElementById(id + 'Code').setAttribute('rows', lines + 2);
+  }
+
+  viewsource('HelloView');
+  viewsource('CounterView');
+  viewsource('CounterView2');
+</script>
