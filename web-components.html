@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Web Components</title>
+  <style>
+    body{
+      padding-top: 50px;
+    }
+
+    textarea{
+      border: 2px solid #777;
+      border-left: 10px solid #777;
+      padding: 0px 20px 20px 5px;
+      background: #222;
+      color: #FFF;
+      line-height: 1.8em;
+      width: 96%;
+      margin: 10px 0;
+    }
+
+    hr{
+      margin: 100px 0px;
+    }
+
+    div[data-view="HelloView"]{
+      padding: 10px;
+      margin: 10px 0;
+    }
+  </style>
+  <script src="web-components.js"></script>
+</head>
+<body>
+<h1><a href="web-components.js">Web Components</a></h1>
+<ul>
+  <li>Helper function to initialize/remove view instances in Javascript. Keeping them in sync with DOM.</li>
+</ul>
+
+
+<hr/>
+
+<h2>Hello Example</h2>
+<p>Debug enabled for this view. Open console for debug messages.</p>
+
+<h3>First Instance</h3>
+<hello-view>
+  <div class="form-container">
+    <form class="hello-form">
+      <input type="text" autocomplete="off" class="name_input" placeholder="trigger keydown" />
+      <input type="text" autocomplete="off" placeholder="doesn't trigger keydown" />
+      <input type="submit" />
+    </form>
+  </div>
+
+  <p class="output"></p>
+  <p>Said hello <span class="count">0</span> times.</p>
+
+  <button class="toggle_event_delegation">Toggle event delegation</button>
+</hello-view>
+
+<textarea id="HelloViewCode" spellcheck="false"></textarea>
+
+<hr/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script id="HelloView">
+class HelloView extends HTMLElement{
+  constructor() {
+    super();
+    this.name = 'HelloView';
+  }
+
+  preinitialize(el){
+    this.el = el;
+
+    this.events = {
+      'keyup :scope > .form-container .name_input': 'handle_keyup',
+      'submit :scope > .form-container .hello-form': 'handle_submit',
+      'submit :scope > .form-container form': 'handle_submit_count',
+      'click :scope > .toggle_event_delegation': 'toggle_event_delegation',
+      'click': 'clicked_el'
+    };
+
+    this.reference_elements = {
+      'output': ':scope > .output',
+      'name_input': ':scope > .form-container .name_input',
+      'count': ':scope > p .count'
+    }
+
+    this.count = 0;
+    this.debug = true;
+  }
+
+  handle_submit(e){
+    e.preventDefault();
+
+    this.output_el().textContent = `Hello ${this.name_input_el().value}!!!`;
+  }
+
+  handle_submit_count(e){
+    e.preventDefault();
+
+    this.count_el().textContent = ++this.count;
+  }
+
+  handle_keyup(e){
+    this.output_el().textContent = `Hello ${this.name_input_el().value}`;
+  }
+
+  toggle_event_delegation(){
+    this.undelegateEvents();
+    alert('undelegateEvents called, will call delegateEvents in 5 seconds. You can view events for el in inspector.');
+    setTimeout(()=>this.delegateEvents(), 5000);
+  }
+
+  clicked_el(){
+    console.log("hello from clicked_el. Triggered by click anywhere in el.");
+  }
+}
+// End of class HelloView
+
+// HelloView.register('hello-view');
+customElements.define('hello-view', HelloView, { extends: "div" });
+</script>

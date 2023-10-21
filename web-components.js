@@ -1,11 +1,7 @@
-/*
-  An Implementation of Backbone.js View.
-*/
-
-class BaseView{
-  constructor(args){
+class BBWebComponent extends HTMLElement {
+  connectedCallback() {
     // https://backbonejs.org/#View-preinitialize
-    this.preinitialize(args);
+    this.preinitialize();
 
     if(this.debug){
       this.el.style.borderWidth = '1px';
@@ -17,6 +13,10 @@ class BaseView{
 
     this.delegateEvents();
     this.setReferenceElements();
+  }
+
+  disconnectedCallback() {
+    this.undelegateEvents();
   }
 
   // https://backbonejs.org/#View-delegateEvents
