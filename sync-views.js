@@ -10,6 +10,8 @@ class SyncViews{
     if(this.debug){
       console.log('SyncViews:', 'Added View Class', viewClass.name);
     }
+
+    this.sync();
   }
 
   static sync(){
